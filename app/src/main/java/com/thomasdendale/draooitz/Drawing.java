@@ -3,8 +3,10 @@ package com.thomasdendale.draooitz;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PorterDuff;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -18,8 +20,12 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.Random;
 
-
+/*
+    This view handles all drawing functions.
+    It also contains the WS event handler for drawing.
+ */
 public class Drawing extends View {
     private static String TAG = "trala";
 
@@ -27,7 +33,8 @@ public class Drawing extends View {
     private Paint paint;
     private Paint canvaspaint;
     private int paintColor = 0xFF997777;
-    private Canvas canvas;
+    private int backgroundColor = 0xFFFBFBFB;
+    private Canvas drawCanvas;
     private Bitmap bitmap;
     private Gson gson;
 
@@ -56,9 +63,13 @@ public class Drawing extends View {
 
     private void setupDrawing() {
 
+        Random r = new Random();
         path = new Path();
         paint = new Paint();
+        paintColor = Color.rgb(r.nextInt(255), r.nextInt(255), r.nextInt(255));
+
         paint.setColor(paintColor);
+
 
         paint.setAntiAlias(true);
         paint.setStrokeWidth(20);
@@ -71,22 +82,21 @@ public class Drawing extends View {
 
         path_data = new ArrayList<>();
         path_to_draw = new ArrayList<>();
-    }
+   }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-        // TODO: copy content from old bitmap to new one
-        canvas = new Canvas(bitmap);
 
+        bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        drawCanvas = new Canvas(bitmap);
+
+        // TODO: copy content from old bitmap to new one
     }
 
     protected void onDraw(Canvas canvas) {
         canvas.drawBitmap(bitmap, 0, 0, canvaspaint);
-        canvas.drawPath(path, paint);       // is current drawing line
-
-
+        canvas.drawPath(path, paint);       // is current drawing line when touching
     }
 
 
@@ -105,7 +115,8 @@ public class Drawing extends View {
                 path_data.add(new Point(X, Y));
                 break;
             case MotionEvent.ACTION_UP:
-                canvas.drawPath(path, paint);
+                drawCanvas.drawPath(path, paint);
+                path.reset();
                 //Log.i(TAG, "onTouchEvent: PATH:"+path_data.get(0).toString());
                 app.send_message(serialize(path_data));
                 break;
@@ -117,6 +128,7 @@ public class Drawing extends View {
         return true;
     }
 
+    // converts a certain array of data points to the correct server message
     private String serialize(ArrayList<Point> path_data) {
 
         if (path_data.size() == 0) {
@@ -141,37 +153,21 @@ public class Drawing extends View {
         bag.setXx(xintarray);
         bag.setYy(yintarray);
 
+        bag.setC(paintColor);
+
         String json = gson.toJson(bag);
-
         String msg = "DRAWPATH:"+json;
-        Log.i(TAG, "serialize: JSON="+msg);
-
-/*        for (int i = 0; i < xintarray.length-1; i++) {
-            msg += String.valueOf(xintarray[i]) + ",";
-        }
-
-        msg += String.valueOf(xintarray[xintarray.length-1]);
-
-        msg += "], \"pathy\":[";
-        for (int i = 0; i < xintarray.length; i++) {
-            msg += String.valueOf(xintarray[i]) + ",";
-        }
-
-        msg += String.valueOf(yintarray[yintarray.length-1]);
-        msg += "]}";*/
+        Log.i(TAG, "serialize: JSON=" + msg);
 
         return msg;
     }
 
-   /* public void send_bitmap_data() {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-        byte[] bytes = stream.toByteArray();
+    public void clear_drawing() {
+        drawCanvas.drawColor(Color.BLACK, PorterDuff.Mode.CLEAR);
+        invalidate();
 
-        Log.i(TAG, "serialize: BYTES");
-
-        app.send_bytes(bytes);
-    }*/
+        app.send_message("CLEARDRAWING");
+    }
 
     public class connection_event_handler implements EventHandler {
 
@@ -185,101 +181,95 @@ public class Drawing extends View {
         public void onTextMessage(String payload) {
             Log.i(TAG, "=>"+payload);
 
-            // first part:
-            //sString[] split = payload.split(":");
-            int splitindex = payload.indexOf(":");
+            /*
+                Parse messages:
+                    - CLEARDRAWING
+                    - PUSH:{"msg":"update_room","content":{"people":?,"name":"???"}}
+                    - PUSH:{"msg":"new_room","content":{"name":"???"}}
+                    - DRAWPATH:{"xx":[?, ...],"yy":[?, ...],"c":?}
+                    - Others: "ok"
+             */
 
-            if (splitindex > 0) {
+            if (payload.equals("CLEARDRAWING")) {
+                clear_drawing();
+            } else {
+                int splitindex = payload.indexOf(":");
 
-                String first = payload.substring(0, splitindex);
+                if (splitindex > 0) {
 
-                if (first.equals("DRAWPATH")) {
-                    String second = payload.substring(splitindex+1);
+                    String first = payload.substring(0, splitindex);
 
-                    Log.i(TAG, "SECOND="+second);
+                    if (first.equals("DRAWPATH")) {
 
-                    JSONpath pathmsg = gson.fromJson(second, JSONpath.class);
+                        int oldColor = paint.getColor();
+                        String second = payload.substring(splitindex+1);
 
-                    Integer[] xx = pathmsg.getXx();
-                    Integer[] yy = pathmsg.getYy();
-                    Path p = new Path();
-                    p.moveTo(xx[0], yy[0]);
+                        Log.i(TAG, "SECOND="+second);
 
-                    for (int i = 1; i < pathmsg.getXx().length; i ++) {
-                        p.lineTo(xx[i], yy[i]);
+                        JSONpath pathmsg = gson.fromJson(second, JSONpath.class);
+
+                        Integer[] xx = pathmsg.getXx();
+                        Integer[] yy = pathmsg.getYy();
+                        Path p = new Path();
+
+                        paint.setColor(pathmsg.getC());
+                        p.moveTo(xx[0], yy[0]);
+
+                        for (int i = 1; i < pathmsg.getXx().length; i ++) {
+                            p.lineTo(xx[i], yy[i]);
+                        }
+
+                        drawCanvas.drawPath(p, paint);
+
+                        paint.setColor(oldColor);
+
+                        invalidate();
                     }
-
-                    canvas.drawPath(p, paint);
-
-                    invalidate();
                 }
+
             }
 
-
-
-            //JSONObject js;
-
-            //try {
-                //js = new JSONObject(payload);
-
-                //String msg = js.getString("msg");
-
-
-                //if (msg.equals("path")) {
-
-                //    JSONpathmsg pathmsg = gson.fromJson(payload, JSONpathmsg.class);
-                //    Log.i(TAG, "path length = " + String.valueOf(pathmsg.getPath().getXx().length));
-/*                    Log.i(TAG, "got path");
-                    JSONObject data = new JSONObject(js.getString("path"));
-                    Log.i(TAG, "data = "+data.toString(1));
-                    JSONArray test = data.getJSONArray("pathx");
-                    Log.i(TAG, "test = " + test.toString());
-                    JSONArray xarray = new JSONArray(data.getJSONArray("pathx"));
-                    JSONArray yarray = new JSONArray(data.getJSONArray("pathy"));
-
-
-                    Log.i(TAG, "array length: " + String.valueOf(xarray));
-                    for (int i = 0; i < xarray.length(); i ++) {
-                        Log.i(TAG, "pathx data: " + String.valueOf(xarray.getInt(i)));
-                    }*/
-
-                //} else {
-                //    Log.i(TAG, "msg = "+msg);
-                //}
-
-            //} catch (JSONException e) {
-            //    e.printStackTrace();
-            //    Log.i(TAG, "onTextMessage: "+e.toString());
-            //}
         }
 
         @Override
         public void onClose(int code, String reason) { }
     }
 
-    class JSONpath {
-        private Integer[] xx;
-        private Integer[] yy;
-        JSONpath(){}
+}
 
-        public Integer[] getXx() {
-            return xx;
-        }
 
-        public void setXx(Integer[] xx) {
-            this.xx = xx;
-        }
+class JSONpath {
+    private Integer[] xx;
+    private Integer[] yy;
 
-        public Integer[] getYy() {
-            return yy;
-        }
+    private int c;
 
-        public void setYy(Integer[] yy) {
-            this.yy = yy;
-        }
-    }
+    JSONpath(){}
+
+    public Integer[] getXx() {
+        return xx;
     }
 
+    public void setXx(Integer[] xx) {
+        this.xx = xx;
+    }
+
+    public Integer[] getYy() {
+        return yy;
+    }
+
+    public void setYy(Integer[] yy) {
+        this.yy = yy;
+    }
+
+    public int getC() {
+        return c;
+    }
+
+    public void setC(int c) {
+        this.c = c;
+    }
+}
 
 class Point {
     private float X;

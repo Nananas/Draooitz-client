@@ -40,6 +40,8 @@ public class NewRoomActivity extends AppCompatActivity {
 
         ((DraooitzApplication) getApplication()).send_message("NEWROOM:"+room_name);
 
+        // todo: check if "ok" received
+
         startActivity(intent);
     }
 }

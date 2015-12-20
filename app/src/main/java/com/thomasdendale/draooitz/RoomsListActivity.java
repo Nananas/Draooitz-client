@@ -12,9 +12,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
@@ -32,6 +30,8 @@ public class RoomsListActivity extends AppCompatActivity {
     public WebSocketConnection wsConnection;
 
     private ArrayList<Room> rooms = new ArrayList<>();
+
+    private Gson gson;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +53,8 @@ public class RoomsListActivity extends AppCompatActivity {
 
         room_list.setAdapter(adapter);
 
+        gson = new Gson();
+
         ((DraooitzApplication) getApplication()).send_message("LEAVEROOM");
 
         showWaiter();
@@ -68,8 +70,6 @@ public class RoomsListActivity extends AppCompatActivity {
                 goto_open_room(item);
             }
         });
-
-
     }
 
     private void goto_open_room(Room r) {
@@ -135,6 +135,7 @@ public class RoomsListActivity extends AppCompatActivity {
             wsConnection.sendTextMessage("GETROOMLIST:ALL");
 
             Log.i(TAG, "onOpen: SPECIAL");
+
         }
 
         @Override
@@ -150,7 +151,64 @@ public class RoomsListActivity extends AppCompatActivity {
 
             Log.i(TAG, "Got response: " + payload);
 
-            try {
+            int index = payload.indexOf(":");
+            if (index > 0) {
+                String first = payload.substring(0, index);
+                String second= payload.substring(index+1);
+
+                switch (first) {
+                    case "LIST":
+                        Log.i(TAG, "onTextMessage: second = "+second);
+                        RoomListMsg msg = gson.fromJson(second, RoomListMsg.class);
+
+                        ArrayList<Room> r = new ArrayList<>();
+
+                        for (RoomMsg rm : msg.getRooms()) {
+                            Room room = new Room(rm.getName());
+                            room.setPlayers(rm.getPeople());
+
+                            r.add(room);
+                        }
+
+                        adapter.setFrom(r);
+
+                        hideWaiter();
+
+                        break;
+
+                    case "PUSH":
+                        PushMsg m = gson.fromJson(second, PushMsg.class);
+                        String type = m.getMsg();
+                        switch (type) {
+                            case "new_room":
+                                //NewRoomMsgContent newRoomMsg = (NewRoomMsgContent) m.getContent();
+
+                                NewRoomPushMsg nrmsg = gson.fromJson(second, NewRoomPushMsg.class);
+
+                                Room room = new Room(nrmsg.getContent().getName());
+                                adapter.add(room);
+                                break;
+
+                            case "update_room":
+                                Log.i(TAG, "onTextMessage: content = " + m.getContent().toString());
+                                UpdateRoomPushMsg urmsg = gson.fromJson(second, UpdateRoomPushMsg.class);
+
+                                adapter.updateRoom(urmsg.getContent().getName(), urmsg.getContent().getPeople());
+
+                                break;
+                            default:
+                                break;
+                        }
+
+                        break;
+
+                    default:
+                        break;
+                }
+
+            }
+
+/*            try {
                 JSONArray js;
 
                 js = new JSONArray(payload);
@@ -202,7 +260,7 @@ public class RoomsListActivity extends AppCompatActivity {
                 } catch (JSONException ee) {
                     Log.i(TAG, ee.toString());
                 }
-            }
+            }*/
 
         }
 
@@ -215,5 +273,137 @@ public class RoomsListActivity extends AppCompatActivity {
 
             hideWaiter();
         }
+    }
+}
+
+class RoomListMsg {
+    private RoomMsg[] rooms;
+
+    public RoomMsg[] getRooms() {
+        return rooms;
+    }
+
+    public void setMsgs(RoomMsg[] msgs) {
+        this.rooms = msgs;
+    }
+}
+
+class RoomMsg {
+    private String name;
+    private int people;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getPeople() {
+        return people;
+    }
+
+    public void setPeople(int people) {
+        this.people = people;
+    }
+}
+
+class PushMsg {
+    private PushMsgContent content;
+    private String msg;
+
+    public PushMsgContent getContent() {
+        return content;
+    }
+
+    public void setContent(PushMsgContent content) {
+        this.content = content;
+    }
+
+    public String getMsg() {
+        return msg;
+    }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
+}
+
+class PushMsgContent {
+}
+
+class NewRoomPushMsg {
+    private NewRoomPushMsgContent content;
+    private String msg;
+
+    public NewRoomPushMsgContent getContent() {
+        return content;
+    }
+
+    public void setContent(NewRoomPushMsgContent content) {
+        this.content = content;
+    }
+
+    public String getMsg() {
+        return msg;
+    }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
+}
+
+class NewRoomPushMsgContent {
+    private String name;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+}
+
+class UpdateRoomPushMsg {
+    private UpdateRoomPushMsgContent content;
+    private String msg;
+
+    public UpdateRoomPushMsgContent getContent() {
+        return content;
+    }
+
+    public void setContent(UpdateRoomPushMsgContent content) {
+        this.content = content;
+    }
+
+    public String getMsg() {
+        return msg;
+    }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
+}
+
+class UpdateRoomPushMsgContent {
+    private String name;
+    private int people;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getPeople() {
+        return people;
+    }
+
+    public void setPeople(int people) {
+        this.people = people;
     }
 }

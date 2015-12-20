@@ -9,8 +9,8 @@ import de.tavendo.autobahn.WebSocketException;
 import de.tavendo.autobahn.WebSocketHandler;
 import de.tavendo.autobahn.WebSocketOptions;
 
-/**
- * Created by thomas on 3/12/15.
+/*
+    @author Thomas Dendale
  */
 public class DraooitzApplication extends Application {
     private static String TAG = "trala";
@@ -21,7 +21,7 @@ public class DraooitzApplication extends Application {
 
     public WebSocketConnection wsConnection;
 
-    // default event handler. Should always be overwritten
+    // default event handler. Should be overwritten
     public EventHandler event_handler = new EventHandler() {
         @Override
         public void onOpen() {
@@ -49,11 +49,12 @@ public class DraooitzApplication extends Application {
         super.onCreate();
 
 
-        //wsuri = "ws://"+getString(R.string.ip_address)+":"+getString(R.string.port_number);
-        wsuri = "ws://"+"thomasdendale.com"+":"+getString(R.string.port_number);
+        wsuri = "ws://"+getString(R.string.ip_address)+":"+getString(R.string.port_number);
+        //wsuri = "ws://"+"thomasdendale.com"+":"+getString(R.string.port_number);
 
         // connect with the server if starting the app
         connect();
+
     }
 
     public void connect() {
@@ -85,6 +86,7 @@ public class DraooitzApplication extends Application {
 
                 @Override
                 public void onClose(int code, String reason) {
+                    // Default behaviour when disconnecting: go back to the login activity
                     Intent intent = new Intent(app, LoginActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
@@ -110,10 +112,18 @@ public class DraooitzApplication extends Application {
 
     }
 
+    // helper function to easily send messages to the server
     public void send_message(String s) {
         if (check_connection()) {
             Log.i(TAG, "sending message: " + s);
             wsConnection.sendTextMessage(s);
+        }
+    }
+
+    // helper function to easily send messages to the server
+    public void send_bytes(byte[] bytes) {
+        if (check_connection()) {
+            wsConnection.sendBinaryMessage(bytes);
         }
     }
 
@@ -123,12 +133,6 @@ public class DraooitzApplication extends Application {
         }
 
         return false;
-    }
-
-    public void send_bytes(byte[] bytes) {
-        if (check_connection()) {
-            wsConnection.sendBinaryMessage(bytes);
-        }
     }
 
     public void reconnect() {
@@ -141,6 +145,10 @@ public class DraooitzApplication extends Application {
 }
 
 
+/*
+    Interface for the Websocket event handler. 
+    This interface is implemented to customise behabiour for WS events
+ */
 interface EventHandler {
     void onOpen();
     void onAlreadyOpen();

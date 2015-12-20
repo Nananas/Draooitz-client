@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 
 import android.os.Build;
@@ -61,7 +62,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
+        FloatingActionButton mEmailSignInButton = (FloatingActionButton) findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -89,13 +90,12 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-    private void goto_information_activity(int score) {
+    private void goto_information_activity() {
         //Intent intent = new Intent(this, InformationActivity.class);
         //startActivity(intent);
 
         //Intent intent = new Intent(this, InformationActivity.class);
         Intent intent = new Intent(this, RoomsListActivity.class);
-        intent.putExtra("score", score);
         //finish();
         startActivity(intent);
     }
@@ -257,21 +257,14 @@ public class LoginActivity extends AppCompatActivity {
             try {
                 JSONObject js;
                 String state;
-                int score = 0;
 
                 js = new JSONObject(payload);
                 state = js.getString("state");
 
-                if (!js.isNull("s")) {
-                    score = js.getInt("s");
-                }
-
-                Log.i("TAG", "Score: "+Integer.toString(score)+", State: "+state);
-
                 if (state.equals("LOGGED_IN") || state.equals("REGISTERED_LOGGED_IN")) {
                     saveCredentials(user, pass);
                     Log.i("TAG", "Logged in");
-                    goto_information_activity(score);
+                    goto_information_activity();
                 } else {
                     mPasswordView.setError(getString(R.string.error_incorrect_password));
                     mPasswordView.requestFocus();
