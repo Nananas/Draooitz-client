@@ -1,6 +1,7 @@
 package com.thomasdendale.draooitz;
 
 import android.graphics.Point;
+import android.graphics.PorterDuff;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -26,14 +27,27 @@ public class DrawingActivity extends AppCompatActivity implements View.OnTouchLi
         drawing = (Drawing) findViewById(R.id.drawing);
         drawing.setApp((DraooitzApplication) getApplication());
 
-
-        FloatingActionButton button = (FloatingActionButton) findViewById(R.id.open_menu_button);
-        button.setOnClickListener(new View.OnClickListener() {
+        FloatingActionButton clearbutton = (FloatingActionButton) findViewById(R.id.clear_drawing_button);
+        clearbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 drawing.clear_drawing();
             }
         });
+
+        final FloatingActionButton randombutton = (FloatingActionButton) findViewById(R.id.random_color_button);
+        randombutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int color = drawing.random_color();
+                //randombutton.setBackgroundColor(color);
+                randombutton.setColorFilter(color);
+
+
+            }
+        });
+
+        randombutton.setColorFilter(drawing.get_color());
     }
 
     @Override

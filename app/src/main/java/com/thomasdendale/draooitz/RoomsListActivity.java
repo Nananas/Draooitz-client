@@ -11,6 +11,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+import com.thomasdendale.draooitz.messages.*;
 
 import com.google.gson.Gson;
 
@@ -57,7 +58,7 @@ public class RoomsListActivity extends AppCompatActivity {
 
         ((DraooitzApplication) getApplication()).send_message("LEAVEROOM");
 
-        showWaiter();
+        //showWaiter();
 
         load_data();
 
@@ -77,11 +78,18 @@ public class RoomsListActivity extends AppCompatActivity {
 
        // Log.i(TAG, "goto_open_room: room = " + r.getName());
 
-        ((DraooitzApplication) getApplication()).send_message("ENTERROOM:"+r.getName());
+        ((DraooitzApplication) getApplication()).send_message("ENTERROOM:" + r.getName());
 
         startActivity(intent);
 
         // TODO: request bitmap data
+    }
+
+    @Override
+    protected void onResume() {
+        showWaiter();
+        load_data();
+        super.onResume();
     }
 
     private void goto_create_new_room() {
@@ -96,9 +104,9 @@ public class RoomsListActivity extends AppCompatActivity {
         load_data_event_handler handler = new load_data_event_handler(this);
 
         ((DraooitzApplication) getApplication()).set_event_handler(handler);
-
+        ((DraooitzApplication) getApplication()).send_message("GETROOMLIST:ALL");
         // if connection was lost at some point
-        ((DraooitzApplication) getApplication()).connect();
+        //((DraooitzApplication) getApplication()).connect();
 
     }
 
@@ -122,27 +130,27 @@ public class RoomsListActivity extends AppCompatActivity {
         load_data_event_handler(Context context) {
             this.context = context;
 
-            Log.i(TAG, "login_event_handler: wsconnection");
-            if (wsConnection.isConnected())
-                Log.i(TAG, "login_event_handler: connected");
-            else
-                Log.i(TAG, "login_event_handler: not connected");
+//            Log.i(TAG, "login_event_handler: wsconnection");
+//            if (wsConnection.isConnected())
+//                Log.i(TAG, "login_event_handler: connected");
+//            else
+//                Log.i(TAG, "login_event_handler: not connected");
         }
 
-        private void send_message() {
-            // TODO: this gives an error sometimes
-            wsConnection = ((DraooitzApplication) getApplication()).wsConnection;
-            wsConnection.sendTextMessage("GETROOMLIST:ALL");
-
-            Log.i(TAG, "onOpen: SPECIAL");
-
-        }
-
-        @Override
-        public void onOpen() { send_message(); }
+//        private void send_message()
+//            // TODO: this gives an error sometimes
+//            wsConnection = ((DraooitzApplication) getApplication()).wsConnection;
+//            wsConnection.sendTextMessage("GETROOMLIST:ALL");
+//
+//            Log.i(TAG, "onOpen: SPECIAL");
+//
+//        }
 
         @Override
-        public void onAlreadyOpen() { send_message(); }
+        public void onOpen() { }
+
+        @Override
+        public void onAlreadyOpen() { }
 
         @Override
         public void onTextMessage(String payload) {
@@ -208,60 +216,6 @@ public class RoomsListActivity extends AppCompatActivity {
 
             }
 
-/*            try {
-                JSONArray js;
-
-                js = new JSONArray(payload);
-
-                int s = js.length();
-
-                Log.i(TAG, "onTextMessage: length" + Integer.toString(s));
-
-                ArrayList<Room> r = new ArrayList<>();
-
-                for (int i = 0; i < s; i ++) {
-                    JSONObject obj = js.optJSONObject(i);
-                    if (obj != null) {
-                        Log.i(TAG, "onTextMessage: " + obj.toString());
-
-                        String name = obj.getString("name");
-
-                        r.add(new Room(name));
-                    }
-                    else {
-                        Log.i(TAG, "onTextMessage: NULL");
-                    }
-                }
-
-                adapter.setFrom(r);
-
-                hideWaiter();
-
-            } catch (JSONException e) {
-
-                Log.i(TAG, e.toString());
-
-                try {
-                    JSONObject js;
-                    js = new JSONObject(payload);
-
-                    String msg = js.getString("msg");
-                    switch (msg) {
-                        case "new_room":
-                            String room_name = js.getString("name");
-
-                            adapter.add(new Room(room_name));
-
-                            break;
-                        default:
-                            break;
-                    }
-
-                } catch (JSONException ee) {
-                    Log.i(TAG, ee.toString());
-                }
-            }*/
-
         }
 
         @Override
@@ -276,134 +230,13 @@ public class RoomsListActivity extends AppCompatActivity {
     }
 }
 
-class RoomListMsg {
-    private RoomMsg[] rooms;
 
-    public RoomMsg[] getRooms() {
-        return rooms;
-    }
 
-    public void setMsgs(RoomMsg[] msgs) {
-        this.rooms = msgs;
-    }
-}
 
-class RoomMsg {
-    private String name;
-    private int people;
 
-    public String getName() {
-        return name;
-    }
 
-    public void setName(String name) {
-        this.name = name;
-    }
 
-    public int getPeople() {
-        return people;
-    }
 
-    public void setPeople(int people) {
-        this.people = people;
-    }
-}
 
-class PushMsg {
-    private PushMsgContent content;
-    private String msg;
 
-    public PushMsgContent getContent() {
-        return content;
-    }
 
-    public void setContent(PushMsgContent content) {
-        this.content = content;
-    }
-
-    public String getMsg() {
-        return msg;
-    }
-
-    public void setMsg(String msg) {
-        this.msg = msg;
-    }
-}
-
-class PushMsgContent {
-}
-
-class NewRoomPushMsg {
-    private NewRoomPushMsgContent content;
-    private String msg;
-
-    public NewRoomPushMsgContent getContent() {
-        return content;
-    }
-
-    public void setContent(NewRoomPushMsgContent content) {
-        this.content = content;
-    }
-
-    public String getMsg() {
-        return msg;
-    }
-
-    public void setMsg(String msg) {
-        this.msg = msg;
-    }
-}
-
-class NewRoomPushMsgContent {
-    private String name;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-}
-
-class UpdateRoomPushMsg {
-    private UpdateRoomPushMsgContent content;
-    private String msg;
-
-    public UpdateRoomPushMsgContent getContent() {
-        return content;
-    }
-
-    public void setContent(UpdateRoomPushMsgContent content) {
-        this.content = content;
-    }
-
-    public String getMsg() {
-        return msg;
-    }
-
-    public void setMsg(String msg) {
-        this.msg = msg;
-    }
-}
-
-class UpdateRoomPushMsgContent {
-    private String name;
-    private int people;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getPeople() {
-        return people;
-    }
-
-    public void setPeople(int people) {
-        this.people = people;
-    }
-}

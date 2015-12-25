@@ -152,6 +152,8 @@ public class LoginActivity extends AppCompatActivity {
             login_event_handler handler = new login_event_handler(user, password);
 
             ((DraooitzApplication) getApplication()).set_event_handler(handler);
+            ((DraooitzApplication) getApplication()).send_message("LOGIN:"+user+","+password);
+
 
             Log.i(TAG, "attemptLogin: end");
         }
@@ -224,26 +226,26 @@ public class LoginActivity extends AppCompatActivity {
             this.user = user;
             this.pass = pass;
 
-            Log.i(TAG, "login_event_handler: wsconnection");
-            if (wsConnection.isConnected())
-                Log.i(TAG, "login_event_handler: connected");
-            else
-                Log.i(TAG, "login_event_handler: not connected");
+//            Log.i(TAG, "login_event_handler: wsconnection");
+//            if (wsConnection.isConnected())
+//                Log.i(TAG, "login_event_handler: connected");
+//            else
+//                Log.i(TAG, "login_event_handler: not connected");
         }
 
         @Override
         public void onOpen() {
-            wsConnection = ((DraooitzApplication) getApplication()).wsConnection;
-            wsConnection.sendTextMessage("LOGIN:" + user + "," + pass);
-
-            Log.i(TAG, "onOpen: SPECIAL");
+//            wsConnection = ((DraooitzApplication) getApplication()).wsConnection;
+//            wsConnection.sendTextMessage("LOGIN:" + user + "," + pass);
+//
+//            Log.i(TAG, "onOpen: SPECIAL");
         }
 
         @Override
         public void onAlreadyOpen() {
-            wsConnection = ((DraooitzApplication) getApplication()).wsConnection;
-            wsConnection.sendTextMessage("LOGIN:" + user + "," + pass);
-            Log.i(TAG, "onAlreadyOpen: ??");
+//            wsConnection = ((DraooitzApplication) getApplication()).wsConnection;
+//            wsConnection.sendTextMessage("LOGIN:" + user + "," + pass);
+//            Log.i(TAG, "onAlreadyOpen: ??");
         }
 
         @Override

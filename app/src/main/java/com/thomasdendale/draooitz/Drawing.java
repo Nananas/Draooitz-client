@@ -169,6 +169,18 @@ public class Drawing extends View {
         app.send_message("CLEARDRAWING");
     }
 
+    public int get_color() {
+        return paintColor;
+    }
+
+    public int random_color() {
+        Random r = new Random();
+        paintColor = Color.rgb(r.nextInt(255), r.nextInt(255), r.nextInt(255));
+
+        paint.setColor(paintColor);
+        return paintColor;
+    }
+
     public class connection_event_handler implements EventHandler {
 
         @Override

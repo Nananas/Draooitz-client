@@ -49,8 +49,8 @@ public class DraooitzApplication extends Application {
         super.onCreate();
 
 
-        wsuri = "ws://"+getString(R.string.ip_address)+":"+getString(R.string.port_number);
-        //wsuri = "ws://"+"thomasdendale.com"+":"+getString(R.string.port_number);
+        //wsuri = "ws://"+getString(R.string.ip_address)+":"+getString(R.string.port_number);
+        wsuri = "ws://"+"thomasdendale.com"+":"+getString(R.string.port_number);
 
         // connect with the server if starting the app
         connect();

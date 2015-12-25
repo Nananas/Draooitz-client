@@ -6,7 +6,7 @@
     tools:context="com.thomasdendale.draooitz.DrawingActivity"
     android:orientation="horizontal">
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/open_menu_button"
+        android:id="@+id/clear_drawing_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_landscape_arrow"
@@ -16,11 +16,23 @@
         android:layout_marginBottom="10dp"
         android:layout_marginRight="10dp"
         />
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/random_color_button"
+        android:visibility="visible"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_pencil"
+        android:background="@color/colorAccent"
+        android:layout_marginRight="10dp"
+        android:layout_above="@+id/clear_drawing_button"
+        android:layout_alignStart="@+id/clear_drawing_button"
+        android:layout_marginBottom="22dp" />
     <com.thomasdendale.draooitz.Drawing
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:id="@+id/drawing"
-        android:background="#FFFFFFFF"/>
+        android:background="#FFFFFFFF"
+        />
 
 
 </RelativeLayout>
