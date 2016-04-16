@@ -37,6 +37,7 @@ public class NewRoomActivity extends AppCompatActivity {
 
     private void open_room(String room_name) {
         Intent intent = new Intent(this, DrawingActivity.class);
+        intent.putExtra("roomname", room_name);
 
         ((DraooitzApplication) getApplication()).send_message("NEWROOM:"+room_name);
 

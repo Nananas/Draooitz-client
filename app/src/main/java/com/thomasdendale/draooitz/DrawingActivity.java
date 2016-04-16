@@ -5,6 +5,7 @@ import android.graphics.PorterDuff;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
@@ -40,14 +41,15 @@ public class DrawingActivity extends AppCompatActivity implements View.OnTouchLi
             @Override
             public void onClick(View v) {
                 int color = drawing.random_color();
-                //randombutton.setBackgroundColor(color);
                 randombutton.setColorFilter(color);
-
-
             }
         });
 
         randombutton.setColorFilter(drawing.get_color());
+
+        //ActionBar a = getActionBar();
+        //getActionBar().setTitle(getIntent().getStringExtra("roomname"))l;
+        //Toolbar actionbar = (Toolbar) findViewById(R.id)
     }
 
     @Override

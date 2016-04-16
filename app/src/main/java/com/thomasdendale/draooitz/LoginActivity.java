@@ -16,13 +16,15 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import de.tavendo.autobahn.WebSocketConnection;
 
@@ -136,8 +138,8 @@ public class LoginActivity extends AppCompatActivity {
             mEmailView.setError(getString(R.string.error_field_required));
             focusView = mEmailView;
             cancel = true;
-        } else if (!isEmailValid(user)) {
-            mEmailView.setError(getString(R.string.error_invalid_email));
+        } else if (!isUserValid(user)) {
+            mEmailView.setError("This Username is invalid.\nDo not use spaces.");
             focusView = mEmailView;
             cancel = true;
         }
@@ -149,23 +151,33 @@ public class LoginActivity extends AppCompatActivity {
         } else {
             showProgress(true);
 
-            login_event_handler handler = new login_event_handler(user, password);
-
+            login_event_handler handler = new login_event_handler(user, password);  // Pass relevant data as constructor, so that the callback can save the credentials to the storage
+                                                                                    // I don't really like this though...
             ((DraooitzApplication) getApplication()).set_event_handler(handler);
-            ((DraooitzApplication) getApplication()).send_message("LOGIN:"+user+","+password);
+            // send password as hash
+            MessageDigest md = null; // No propper way of hashing strings in a reliable way?
+            String password_hashed = "";
+            try {
+                md = MessageDigest.getInstance("SHA");
+                md.reset();
+                md.update(password.getBytes());
+                password_hashed = new String(md.digest());
+            } catch (NoSuchAlgorithmException e) {
+                password_hashed = password;     // SHA encryption not supported?
+            }
+
+            ((DraooitzApplication) getApplication()).send_message("LOGIN:"+user+","+password_hashed);
 
 
             Log.i(TAG, "attemptLogin: end");
         }
     }
 
-    private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
-        return email.contains("@");
+    private boolean isUserValid(String user) {
+        return !user.contains(" ");
     }
 
     private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
         return password.length() > 4;
     }
 
@@ -215,8 +227,6 @@ public class LoginActivity extends AppCompatActivity {
         editor.apply();
     }
 
-
-    // TODO: make it simpler to not use wsConnection directly...
 
     public class login_event_handler implements EventHandler{
         String user;

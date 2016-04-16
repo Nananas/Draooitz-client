@@ -75,6 +75,7 @@ public class RoomsListActivity extends AppCompatActivity {
 
     private void goto_open_room(Room r) {
         Intent intent = new Intent(this, DrawingActivity.class);
+        intent.putExtra("roomname", r.getName());
 
        // Log.i(TAG, "goto_open_room: room = " + r.getName());
 
