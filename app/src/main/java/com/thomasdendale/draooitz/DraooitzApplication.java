@@ -13,11 +13,14 @@ import de.tavendo.autobahn.WebSocketOptions;
     @author Thomas Dendale
  */
 public class DraooitzApplication extends Application {
+    // debug stuff
     private static String TAG = "trala";
 
-    // TODO: extract connection functions, do not let activities make connections manually
+    // release URI
+    private static String wsuri = "ws://thomasdendale.com:8080";
 
-    String wsuri;
+    // debug URI
+    // private static String wsuri = "ws://192.168.1.1:8080";
 
     public WebSocketConnection wsConnection;
 
@@ -48,17 +51,10 @@ public class DraooitzApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-
-        //wsuri = "ws://"+getString(R.string.ip_address)+":"+getString(R.string.port_number);
-        wsuri = "ws://"+"thomasdendale.com"+":"+getString(R.string.port_number);
-
-        //wsuri = "ws://"+"192.168.1.7"+":"+getString(R.string.port_number);
-
-        // connect with the server if starting the app
         connect();
-
     }
 
+    // open the Websocket connection
     public void connect() {
 
         if (wsConnection != null && wsConnection.isConnected())
@@ -75,6 +71,7 @@ public class DraooitzApplication extends Application {
         final DraooitzApplication app = this;
 
         try {
+            // the websocket handler uses callbacks to allow activities to change the behaviour
             wsConnection.connect(wsuri, new WebSocketHandler() {
                 @Override
                 public void onOpen() {
@@ -99,10 +96,12 @@ public class DraooitzApplication extends Application {
 
         } catch (WebSocketException e) {
             Log.i(TAG, e.toString());
+            // note: better error support?
         }
 
     }
 
+    // Public method to change callback for websocket behaviour
     public void set_event_handler(EventHandler handler) {
         event_handler = handler;
 
@@ -129,6 +128,7 @@ public class DraooitzApplication extends Application {
         }
     }
 
+    // helper function
     public boolean check_connection() {
         if (wsConnection != null && wsConnection.isConnected()) {
             return true;
@@ -137,6 +137,7 @@ public class DraooitzApplication extends Application {
         return false;
     }
 
+    // note: not used...?
     public void reconnect() {
         if (check_connection()) {
             wsConnection.disconnect();

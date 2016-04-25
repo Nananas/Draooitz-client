@@ -106,9 +106,6 @@ public class RoomsListActivity extends AppCompatActivity {
 
         ((DraooitzApplication) getApplication()).set_event_handler(handler);
         ((DraooitzApplication) getApplication()).send_message("GETROOMLIST:ALL");
-        // if connection was lost at some point
-        //((DraooitzApplication) getApplication()).connect();
-
     }
 
     private void showWaiter() {
@@ -130,22 +127,7 @@ public class RoomsListActivity extends AppCompatActivity {
 
         load_data_event_handler(Context context) {
             this.context = context;
-
-//            Log.i(TAG, "login_event_handler: wsconnection");
-//            if (wsConnection.isConnected())
-//                Log.i(TAG, "login_event_handler: connected");
-//            else
-//                Log.i(TAG, "login_event_handler: not connected");
         }
-
-//        private void send_message()
-//            // TODO: this gives an error sometimes
-//            wsConnection = ((DraooitzApplication) getApplication()).wsConnection;
-//            wsConnection.sendTextMessage("GETROOMLIST:ALL");
-//
-//            Log.i(TAG, "onOpen: SPECIAL");
-//
-//        }
 
         @Override
         public void onOpen() { }
@@ -189,30 +171,35 @@ public class RoomsListActivity extends AppCompatActivity {
                         PushMsg m = gson.fromJson(second, PushMsg.class);
                         String type = m.getMsg();
                         switch (type) {
-                            case "new_room":
-                                //NewRoomMsgContent newRoomMsg = (NewRoomMsgContent) m.getContent();
-
+                            case "new_room": {
                                 NewRoomPushMsg nrmsg = gson.fromJson(second, NewRoomPushMsg.class);
 
                                 Room room = new Room(nrmsg.getContent().getName());
                                 adapter.add(room);
-                                break;
+                            }
+                            break;
 
-                            case "update_room":
+                            case "update_room": {
                                 Log.i(TAG, "onTextMessage: content = " + m.getContent().toString());
                                 UpdateRoomPushMsg urmsg = gson.fromJson(second, UpdateRoomPushMsg.class);
 
                                 adapter.updateRoom(urmsg.getContent().getName(), urmsg.getContent().getPeople());
 
-                                break;
-                            default:
-                                break;
+                            }
+                            break;
+
+                            default: {
+                                // nothing?
+                            }
+                            break;
                         }
 
                         break;
 
-                    default:
-                        break;
+                    default: {
+                        // nothing?
+                    }
+                    break;
                 }
 
             }

@@ -10,6 +10,7 @@ import android.view.WindowManager;
 import android.widget.EditText;
 
 public class NewRoomActivity extends AppCompatActivity {
+    // debug stuff
     private static String TAG = "trala";
 
     FloatingActionButton create_new_room;
@@ -41,7 +42,7 @@ public class NewRoomActivity extends AppCompatActivity {
 
         ((DraooitzApplication) getApplication()).send_message("NEWROOM:"+room_name);
 
-        // todo: check if "ok" received
+        // note: We might check here if "ok" is actually received...
 
         startActivity(intent);
     }

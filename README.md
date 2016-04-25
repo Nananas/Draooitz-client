@@ -29,8 +29,6 @@ This is the playfield of the player, the canvas of the painter. In this activity
 ## TODO
 
 - Drawing Activity
-    - [ ] Display the room name 
-    - [ ] Allow the player to change the color of this pencil
-    - [ ] Display the player list 
-    - [ ] Make a player master of a room
-    - [ ] Allow the room master to kick players
+    - [x] Display the room name 
+    - [ ] Allow the player to change the color of his pencil
+

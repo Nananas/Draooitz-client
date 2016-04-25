@@ -6,8 +6,7 @@ package com.thomasdendale.draooitz;
 public class Room {
     private String name;
 
-    // TODO: replace with actual player objects
-    private int players;
+    private int players; // player count
 
     Room(String name) {
         this.name = name;
@@ -34,6 +33,8 @@ public class Room {
         return name;
     }
 
-    // & data
+    // This can be extended with additional statistics data
+    // We could even make a room-master of some sort?
+
 
 }

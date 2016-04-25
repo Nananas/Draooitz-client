@@ -30,6 +30,7 @@ import de.tavendo.autobahn.WebSocketConnection;
 
 /**
  * A login screen that offers login via email/password.
+ * Parts from default login activity
  */
 public class LoginActivity extends AppCompatActivity {
 
@@ -93,13 +94,8 @@ public class LoginActivity extends AppCompatActivity {
 
 
     private void goto_information_activity() {
-        //Intent intent = new Intent(this, InformationActivity.class);
-        //startActivity(intent);
-
-        //Intent intent = new Intent(this, InformationActivity.class);
-        Intent intent = new Intent(this, RoomsListActivity.class);
-        //finish();
-        startActivity(intent);
+       Intent intent = new Intent(this, RoomsListActivity.class);
+       startActivity(intent);
     }
 
     /**
@@ -188,6 +184,9 @@ public class LoginActivity extends AppCompatActivity {
         // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
         // for very easy animations. If available, use these APIs to fade-in
         // the progress spinner.
+
+
+        // Uhg, really?
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
             int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
@@ -220,7 +219,6 @@ public class LoginActivity extends AppCompatActivity {
         SharedPreferences sp = getPreferences(MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
 
-        // TODO: make statics
         editor.putString("username", username);
         editor.putString("password", password);
 
@@ -236,27 +234,13 @@ public class LoginActivity extends AppCompatActivity {
             this.user = user;
             this.pass = pass;
 
-//            Log.i(TAG, "login_event_handler: wsconnection");
-//            if (wsConnection.isConnected())
-//                Log.i(TAG, "login_event_handler: connected");
-//            else
-//                Log.i(TAG, "login_event_handler: not connected");
         }
 
         @Override
-        public void onOpen() {
-//            wsConnection = ((DraooitzApplication) getApplication()).wsConnection;
-//            wsConnection.sendTextMessage("LOGIN:" + user + "," + pass);
-//
-//            Log.i(TAG, "onOpen: SPECIAL");
-        }
+        public void onOpen() { }
 
         @Override
-        public void onAlreadyOpen() {
-//            wsConnection = ((DraooitzApplication) getApplication()).wsConnection;
-//            wsConnection.sendTextMessage("LOGIN:" + user + "," + pass);
-//            Log.i(TAG, "onAlreadyOpen: ??");
-        }
+        public void onAlreadyOpen() { }
 
         @Override
         public void onTextMessage(String payload) {

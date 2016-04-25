@@ -27,21 +27,22 @@ import java.util.Random;
     It also contains the WS event handler for drawing.
  */
 public class Drawing extends View {
+    // debug stuff
     private static String TAG = "trala";
 
     private Path path;
     private Paint paint;
     private Paint canvaspaint;
     private int paintColor = 0xFF997777;
-    private int backgroundColor = 0xFFFBFBFB;
+    //private int backgroundColor = 0xFFFBFBFB;
     private Canvas drawCanvas;
     private Bitmap bitmap;
     private Gson gson;
 
     private ArrayList<Point> path_data;
-    private ArrayList<Path> path_to_draw;
+    //private ArrayList<Path> path_to_draw;
 
-    private DraooitzApplication app;
+    private DraooitzApplication app; // for easy access;
 
     public Drawing(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -81,7 +82,7 @@ public class Drawing extends View {
         canvaspaint = new Paint(Paint.DITHER_FLAG);
 
         path_data = new ArrayList<>();
-        path_to_draw = new ArrayList<>();
+        //path_to_draw = new ArrayList<>();
    }
 
     @Override
@@ -91,8 +92,7 @@ public class Drawing extends View {
         bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         drawCanvas = new Canvas(bitmap);
 
-        // TODO: copy content from old bitmap to new one
-    }
+   }
 
     protected void onDraw(Canvas canvas) {
         canvas.drawBitmap(bitmap, 0, 0, canvaspaint);
@@ -300,7 +300,7 @@ class Point {
     }
     @Override
     public String toString() {
-        // TODO: convert float to ints
-        return "{\"x\":"+String.valueOf(X)+", \"y\":"+String.valueOf(Y)+"}";
+
+        return "{\"x\":"+String.valueOf(getX())+", \"y\":"+String.valueOf(getY())+"}";
     }
 }
