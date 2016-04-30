@@ -7,7 +7,7 @@ This repository contains the code for the android based drawing app 'Draooitz'. 
 Import the project in Android Studio, build and run. The device should have a working internet connection.
 
 ### How to play
-Start the game [server](https://github.com/Nananas/Draooitz-server). Make sure the URI in `main/java/com/thomasdendale/draooitz/DraooitzApplication.java` corresponds to the server address. 
+Start the game [server](https://github.com/Nananas/Draooitz-server). Make sure the URI in `main/java/com/thomasdendale/draooitz/DraooitzApplication.java` corresponds to the server address. Default URI points to the server hosted by myself. This server might be down when not needed.
 
 Log in using any username and password. If the user does not exist, it will be created. Create a room or join an existing one and start drawing!
 
