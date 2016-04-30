@@ -2,6 +2,15 @@
 
 This repository contains the code for the android based drawing app 'Draooitz'. This application is the client side, the server can be found [here](https://github.com/Nananas/Draooitz-server).
 
+
+## How to run
+Import the project in Android Studio, build and run. The device should have a working internet connection.
+
+### How to play
+Start the game [server](https://github.com/Nananas/Draooitz-server). Make sure the URI in `main/java/com/thomasdendale/draooitz/DraooitzApplication.java` corresponds to the server address. 
+
+Log in using any username and password. If the user does not exist, it will be created. Create a room or join an existing one and start drawing!
+
 ## Application flow
 ### Application class
 The application class was extended to contain the Autobahn Websocket connection, as to make it accessible to every activity. 
@@ -31,4 +40,5 @@ This is the playfield of the player, the canvas of the painter. In this activity
 - Drawing Activity
     - [x] Display the room name 
     - [ ] Allow the player to change the color of his pencil
+
 
